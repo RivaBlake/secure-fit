@@ -167,5 +167,18 @@ contract CodingPracticeLog is SepoliaConfig {
         return totalFailures[user];
     }
 
+    /// @notice Get encrypted total attempts for a user
+    /// @param user The user address
+    /// @return Encrypted total attempts
+    function getTotalAttempts(address user) external view returns (euint32) {
+        return totalAttempts[user];
+    }
+
+    /// @notice Get encrypted pass rate numerator (successes * 100) for a user
+    /// @param user The user address
+    /// @return Encrypted pass rate numerator
+    function getPassRateNumerator(address user) external view returns (euint32) {
+        return passRateNumerator[user];
+    }
 }
 
