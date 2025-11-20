@@ -43,6 +43,75 @@ describe("CodingPracticeLog", function () {
     expect(entryCount).to.eq(0);
   });
 
+  it("should provide practice statistics for session analysis", async function () {
+    const minutes = 120;
+    const problems = 10;
+    const successes = 8;
+    const failures = 2;
+
+    // Encrypt all values
+    const encryptedInput = await fhevm
+      .createEncryptedInput(contractAddress, signers.alice.address)
+      .add32(minutes)
+      .add32(problems)
+      .add32(successes)
+      .add32(failures)
+      .encrypt();
+
+    const tx = await contract.connect(signers.alice).addEntry(
+      encryptedInput.handles[0],
+      encryptedInput.handles[1],
+      encryptedInput.handles[2],
+      encryptedInput.handles[3],
+      encryptedInput.inputProof
+    );
+    await tx.wait();
+
+    const [totalEntries, avgMinutes, avgProblems] = await contract.getPracticeStatistics(signers.alice.address);
+    expect(totalEntries).to.equal(1);
+
+    // Decrypt and verify averages
+    const decryptedAvgMinutes = await fhevm.userDecryptEuint(
+      FhevmType.euint32,
+      avgMinutes,
+      contractAddress,
+      signers.alice,
+    );
+    expect(decryptedAvgMinutes).to.equal(minutes);
+  });
+
+  it("should support batch entry addition for multiple practice sessions", async function () {
+    // Create multiple encrypted entries
+    const entries = [
+      { minutes: 60, problems: 5, successes: 4, failures: 1 },
+      { minutes: 90, problems: 7, successes: 6, failures: 1 },
+    ];
+
+    const encryptedInputs = [];
+    for (const entry of entries) {
+      const encryptedInput = await fhevm
+        .createEncryptedInput(contractAddress, signers.alice.address)
+        .add32(entry.minutes)
+        .add32(entry.problems)
+        .add32(entry.successes)
+        .add32(entry.failures)
+        .encrypt();
+      encryptedInputs.push(encryptedInput);
+    }
+
+    // Batch add entries
+    await contract.connect(signers.alice).batchAddEntries(
+      encryptedInputs.map(e => e.handles[0]),
+      encryptedInputs.map(e => e.handles[1]),
+      encryptedInputs.map(e => e.handles[2]),
+      encryptedInputs.map(e => e.handles[3]),
+      encryptedInputs[0].inputProof // Use first proof for simplicity
+    );
+
+    const entryCount = await contract.getEntryCount(signers.alice.address);
+    expect(entryCount).to.equal(2);
+  });
+
   it("should add a practice entry and update statistics", async function () {
     const minutes = 120;
     const problems = 10;
