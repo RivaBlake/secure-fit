@@ -230,5 +230,27 @@ contract CodingPracticeLog is SepoliaConfig {
 
         emit StatisticsUpdated(msg.sender);
     }
+
+    /// @notice Get practice statistics for a user
+    /// @param user The user address
+    /// @return totalEntries Total number of practice entries
+    /// @return averageMinutes Average minutes per practice session
+    /// @return averageProblems Average problems solved per session
+    function getPracticeStatistics(address user)
+        external
+        view
+        returns (uint256 totalEntries, euint32 averageMinutes, euint32 averageProblems)
+    {
+        totalEntries = userEntries[user].length;
+        if (totalEntries > 0) {
+            averageMinutes = totalMinutes[user] / FHE.asEuint32(totalEntries);
+            averageProblems = totalProblems[user] / FHE.asEuint32(totalEntries);
+        } else {
+            averageMinutes = FHE.asEuint32(0);
+            averageProblems = FHE.asEuint32(0);
+        }
+
+        return (totalEntries, averageMinutes, averageProblems);
+    }
 }
 
