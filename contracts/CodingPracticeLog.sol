@@ -180,5 +180,55 @@ contract CodingPracticeLog is SepoliaConfig {
     function getPassRateNumerator(address user) external view returns (euint32) {
         return passRateNumerator[user];
     }
+
+    /// @notice Add multiple practice entries in a single transaction
+    /// @param encryptedMinutesArray Array of encrypted minutes spent coding
+    /// @param encryptedProblemsArray Array of encrypted number of problems solved
+    /// @param encryptedSuccessesArray Array of encrypted number of successful attempts
+    /// @param encryptedFailuresArray Array of encrypted number of failed attempts
+    /// @param inputProof The input proof for all encrypted values
+    function batchAddEntries(
+        externalEuint32[] calldata encryptedMinutesArray,
+        externalEuint32[] calldata encryptedProblemsArray,
+        externalEuint32[] calldata encryptedSuccessesArray,
+        externalEuint32[] calldata encryptedFailuresArray,
+        bytes calldata inputProof
+    ) external {
+        require(encryptedMinutesArray.length == encryptedProblemsArray.length, "Array length mismatch");
+        require(encryptedMinutesArray.length == encryptedSuccessesArray.length, "Array length mismatch");
+        require(encryptedMinutesArray.length == encryptedFailuresArray.length, "Array length mismatch");
+        require(encryptedMinutesArray.length > 0, "Cannot add empty batch");
+        require(encryptedMinutesArray.length <= 10, "Batch size limited to 10 entries for gas efficiency");
+
+        for (uint256 i = 0; i < encryptedMinutesArray.length; i++) {
+            // Convert external ciphertexts to internal encrypted types
+            euint32 codingMinutes = FHE.fromExternal(encryptedMinutesArray[i], inputProof);
+            euint32 problems = FHE.fromExternal(encryptedProblemsArray[i], inputProof);
+            euint32 successes = FHE.fromExternal(encryptedSuccessesArray[i], inputProof);
+            euint32 failures = FHE.fromExternal(encryptedFailuresArray[i], inputProof);
+
+            // Store the practice entry
+            userEntries[msg.sender].push(PracticeEntry({
+                timestamp: block.timestamp,
+                codingMinutes: codingMinutes,
+                problems: problems,
+                successes: successes,
+                failures: failures
+            }));
+
+            // Update encrypted statistics
+            totalMinutes[msg.sender] = totalMinutes[msg.sender] + codingMinutes;
+            totalProblems[msg.sender] = totalProblems[msg.sender] + problems;
+            totalSuccesses[msg.sender] = totalSuccesses[msg.sender] + successes;
+            totalFailures[msg.sender] = totalFailures[msg.sender] + failures;
+            euint32 attempts = successes + failures;
+            totalAttempts[msg.sender] = totalAttempts[msg.sender] + attempts;
+            passRateNumerator[msg.sender] = passRateNumerator[msg.sender] + (successes * FHE.asEuint32(100));
+
+            emit EntryAdded(msg.sender, userEntries[msg.sender].length - 1, block.timestamp);
+        }
+
+        emit StatisticsUpdated(msg.sender);
+    }
 }
 
