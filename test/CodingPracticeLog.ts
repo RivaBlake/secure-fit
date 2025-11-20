@@ -38,6 +38,10 @@ describe("CodingPracticeLog", function () {
     ({ contract, contractAddress } = await deployFixture());
   });
 
+  it("should have zero entries after deployment", async function () {
+    const entryCount = await contract.getEntryCount(signers.alice.address);
+    expect(entryCount).to.eq(0);
+  });
 
   it("should add a practice entry and update statistics", async function () {
     const minutes = 120;
