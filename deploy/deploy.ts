@@ -10,6 +10,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     log: true,
   });
 
+  console.log(`CodingPracticeLog contract: `, deployedCodingPracticeLog.address);
+
 };
 export default func;
 func.id = "deploy_codingPracticeLog"; // id required to prevent reexecution
