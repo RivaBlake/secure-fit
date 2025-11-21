@@ -6,6 +6,7 @@ import { ethers } from 'ethers';
 import { createPublicClient, http } from 'viem';
 import { useEthersSigner } from '../hooks/useEthersSigner';
 import { useZamaInstance } from '../hooks/useZamaInstance';
+import { CONTRACT_ABI, getContractAddress } from '../config/contracts';
 import { useWalletClient } from 'wagmi';
 
 type PracticeEntry = {
@@ -52,6 +53,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [decrypting, setDecrypting] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const zero = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
