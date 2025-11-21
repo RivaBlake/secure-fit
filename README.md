@@ -2,6 +2,11 @@
 
 A fully homomorphic encryption (FHE) based application for tracking daily coding practice without revealing sensitive details.
 
+## 🔗 Links
+
+- **📹 Demo Video**: [Watch on GitHub](https://github.com/RivaBlake/secure-fit.git/blob/main/secure-fit.mp4)
+- **🌐 Live Demo**: [View on Vercel](https://secure-fit-demo.vercel.app/)
+
 ## Features
 
 - **Encrypted Data Storage**: All practice data (minutes, problems, successes, failures) is encrypted using FHE
