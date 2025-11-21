@@ -112,6 +112,39 @@ describe("CodingPracticeLog", function () {
     expect(entryCount).to.equal(2);
   });
 
+  it("should validate batch size limits for gas efficiency", async function () {
+    // Create 11 entries (exceeds limit)
+    const entries = Array(11).fill(null).map((_, i) => ({
+      minutes: 30,
+      problems: 2,
+      successes: 1,
+      failures: 1,
+    }));
+
+    const encryptedInputs = [];
+    for (const entry of entries) {
+      const encryptedInput = await fhevm
+        .createEncryptedInput(contractAddress, signers.alice.address)
+        .add32(entry.minutes)
+        .add32(entry.problems)
+        .add32(entry.successes)
+        .add32(entry.failures)
+        .encrypt();
+      encryptedInputs.push(encryptedInput);
+    }
+
+    // Should reject batch larger than 10
+    await expect(
+      contract.connect(signers.alice).batchAddEntries(
+        encryptedInputs.map(e => e.handles[0]),
+        encryptedInputs.map(e => e.handles[1]),
+        encryptedInputs.map(e => e.handles[2]),
+        encryptedInputs.map(e => e.handles[3]),
+        encryptedInputs[0].inputProof
+      )
+    ).to.be.revertedWith("Batch size limited to 10 entries for gas efficiency");
+  });
+
   it("should add a practice entry and update statistics", async function () {
     const minutes = 120;
     const problems = 10;
