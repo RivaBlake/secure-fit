@@ -7,6 +7,7 @@ import {SepoliaConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
 /// @title CodingPracticeLog - Encrypted Coding Practice Log
 /// @notice A contract for storing encrypted daily coding practice data
 /// @dev Uses FHE to encrypt and compute statistics on practice data
+/// Enhanced with batch operations and comprehensive analytics
 contract CodingPracticeLog is SepoliaConfig {
     /// @notice Structure to store a practice entry
     struct PracticeEntry {
