@@ -277,5 +277,11 @@ contract CodingPracticeLog is SepoliaConfig {
 
         return sessionCount;
     }
+
+    /// @notice Get current contract version
+    /// @return Version string
+    function version() external pure returns (string memory) {
+        return "1.0.0";
+    }
 }
 
