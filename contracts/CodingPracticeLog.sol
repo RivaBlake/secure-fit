@@ -253,5 +253,29 @@ contract CodingPracticeLog is SepoliaConfig {
 
         return (totalEntries, averageMinutes, averageProblems);
     }
+
+    /// @notice Get practice session count for a specific time period
+    /// @param user The user address
+    /// @param startTime Start timestamp for the period
+    /// @param endTime End timestamp for the period
+    /// @return sessionCount Number of practice sessions in the period
+    function getPracticeSessionsInPeriod(address user, uint256 startTime, uint256 endTime)
+        external
+        view
+        returns (uint256 sessionCount)
+    {
+        require(startTime < endTime, "Invalid time range");
+
+        PracticeEntry[] memory entries = userEntries[user];
+        sessionCount = 0;
+
+        for (uint256 i = 0; i < entries.length; i++) {
+            if (entries[i].timestamp >= startTime && entries[i].timestamp <= endTime) {
+                sessionCount++;
+            }
+        }
+
+        return sessionCount;
+    }
 }
 
