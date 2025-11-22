@@ -4,7 +4,7 @@ A fully homomorphic encryption (FHE) based application for tracking daily coding
 
 ## 🔗 Links
 
-- **📹 Demo Video**: [Watch on GitHub](https://github.com/RivaBlake/secure-fit.git/blob/main/secure-fit.mp4)
+- **📹 Demo Video**: [Watch on GitHub](https://github.com/RivaBlake/secure-fit/blob/main/secure-fit.mp4)
 - **🌐 Live Demo**: [View on Vercel](https://secure-fit-seven.vercel.app/)
 
 ## Features
